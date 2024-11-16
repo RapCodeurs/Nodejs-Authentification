@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { disconnect } = require('mongoose');
+
 
 //register controller
 
@@ -75,21 +75,22 @@ const loginUser = async(req, res) => {
     //Recherche if the user exite dans la base de données
     const user = await User.findOne({username});
 
+    /*
     if(!user){
       return res.status(402).json({
         succes: false,
-        message: "L'tilisateur n'existe pas 😞"
+        message: "L'utilisateur n'existe pas 😞"
       })
-    }
+    }*/
 
     // verifier si le mot de passe est correct
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
-    if(!isPasswordMatch){
+    if(!isPasswordMatch || !user){
       return res.status(402).json({
         succes: false,
-        message: 'utilisateur ou mot de passe invalide'
+        message: 'utilisateur ou mot de passe invalide 😔'
       })
     }
 
@@ -227,6 +228,7 @@ const deleteUser = async(req, res) => {
     // Recuperation de l'id de l'utilisateur
     const {id} = req.params;
 
+     // Suppression de l'id de l'utilisateur
     const userId = await User.findByIdAndDelete(id);
 
     if(!userId){
@@ -238,7 +240,7 @@ const deleteUser = async(req, res) => {
 
     res.status(200).json({
       succes: true,
-      message: "Utilisateur supprimé avec succes, 😊 voici l'utilisateur"
+      message: "Utilisateur supprimé avec succes 😊"
     })
 
 
@@ -250,5 +252,8 @@ const deleteUser = async(req, res) => {
     })
   }
 }
+
+
+
 
 module.exports = {registerUser, loginUser, getAllUser, getOneUser, updateUser, deleteUser}
